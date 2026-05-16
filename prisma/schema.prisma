@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Receta {
+  id                 String   @id @default(uuid())
+  createdAt          DateTime @default(now())
+  title              String
+  description        String
+  difficulty         String   
+  totalTime          Int      @default(30)
+  ricor              Int
+  contenido_markdown String
+  imagen_url         String?  
+
+  @@map("recetas") 
+}
