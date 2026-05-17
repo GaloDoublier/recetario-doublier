@@ -6,6 +6,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -25,10 +26,10 @@ export function SiteHeader() {
             className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
           >
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-              <ChefHat className="w-5 h-5 text-primary-foreground" />
+              <Image src="/galogo.png" alt="Logo" width={70} height={70} className="text-primary-foreground rounded-full" />
             </div>
             <span className="font-heading text-xl italic text-foreground">
-              Mi Cocina
+              Recetario-Doublier
             </span>
           </Link>
 

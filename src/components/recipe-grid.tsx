@@ -35,9 +35,12 @@ export const RecipeGrid = forwardRef<HTMLElement, RecipeGridProps>(
     }, [recipes, filters]);
 
     return (
-      <section ref={ref} id="recipes" className="py-16 md:py-24 pattern-section bg-card/40">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-1">
-          <div className="text-center mb-12 animate-fade-in-up">
+      <section ref={ref} id="recipes" className=" relative pattern-bg">
+        
+        {/* 2. Al contenedor interno le damos forma de "tarjeta" gigante */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8 lg:px-12 min-h-screen relative z-10 pattern-section bg-background overflow-hidden">
+          
+          <div className="text-center mb-12 animate-fade-in-up relative z-20">
             <span className="text-primary font-medium text-sm uppercase tracking-[0.2em]">
               Mis Creaciones
             </span>
@@ -50,31 +53,33 @@ export const RecipeGrid = forwardRef<HTMLElement, RecipeGridProps>(
             </p>
           </div>
 
-          <div className="animate-fade-in-up delay-1">
+          <div className="animate-fade-in-up delay-1 relative z-20">
             <RecipeFiltersComponent filters={filters} onFiltersChange={setFilters} />
           </div>
 
-          {filteredRecipes.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredRecipes.map((recipe, i) => (
-                <Link key={recipe.slug} href={`/recetas/${recipe.slug}`} className="block animate-fade-in-up" style={{ animationDelay: `${0.1 + i * 0.05}s` }}>
-                  <RecipeCard recipe={recipe} />
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16 animate-fade-in">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🍳</span>
+          <div className="relative z-20">
+            {filteredRecipes.length > 0 ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredRecipes.map((recipe, i) => (
+                  <Link key={recipe.slug} href={`/recetas/${recipe.slug}`} className="block animate-fade-in-up" style={{ animationDelay: `${0.1 + i * 0.05}s` }}>
+                    <RecipeCard recipe={recipe} />
+                  </Link>
+                ))}
               </div>
-              <p className="text-muted-foreground text-lg">
-                Parece que todavía no cociné lo que buscas :&apos;C
-              </p>
-              <p className="text-sm text-muted-foreground/60 mt-2">
-                ¡Pronto habrá más recetas!
-              </p>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-16 animate-fade-in">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">🍳</span>
+                </div>
+                <p className="text-muted-foreground text-lg">
+                  Parece que todavía no cociné lo que buscas :&apos;C
+                </p>
+                <p className="text-sm text-muted-foreground/60 mt-2">
+                  ¡Pronto habrá más recetas!
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     );

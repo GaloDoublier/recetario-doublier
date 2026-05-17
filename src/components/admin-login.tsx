@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
-import { ChefHat, Loader2, Lock, User } from "lucide-react";
+import {  Loader2, Lock, User } from "lucide-react";
+import Image from "next/image";
 
 export function AdminLogin() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export function AdminLogin() {
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-              <ChefHat className="w-8 h-8 text-primary-foreground" />
+              <Image src="/galogo.png" alt="Logo" width={24} height={24} className="text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">
               Panel de Administración

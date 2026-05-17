@@ -139,9 +139,19 @@
 
 /* Pattern background utility */
 .pattern-bg {
+  position: relative;
+}
+
+.pattern-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: url('/pattern-bg.jpg');
   background-repeat: repeat;
-  background-size: 200px 200px;
+  background-size: 400px 400px;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .pattern-bg-subtle {
@@ -164,9 +174,19 @@
 /* Metemos las clases de tu patrón en la capa de utilidades para que Tailwind las detecte */
 @layer utilities {
   .pattern-bg {
+    position: relative;
+  }
+
+  .pattern-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
     background-image: url('/pattern-bg.jpg');
     background-repeat: repeat;
     background-size: 200px 200px;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 0;
   }
 
   .pattern-bg-subtle {

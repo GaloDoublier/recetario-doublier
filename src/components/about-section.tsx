@@ -1,9 +1,10 @@
 "use client";
 
-import { author } from "@/lib/mock-data";
+import { author } from "@/lib/constant-data";
 import { Button } from "@/src/components/ui/button";
-import { Camera, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface AboutSectionProps {
   onViewRecipes?: () => void;
@@ -18,25 +19,34 @@ export function AboutSection({ onViewRecipes }: AboutSectionProps) {
           <div className="relative animate-fade-in-up">
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 aspect-[4/3] rounded-2xl overflow-hidden relative shadow-lg ring-1 ring-black/5">
-                <div className="absolute inset-0 bg-gradient-to-br from-secondary to-secondary/70">
-                  <div className="absolute inset-0" style={{ backgroundImage: 'url(/pattern-bg.jpg)', backgroundRepeat: 'repeat', backgroundSize: '120px 120px', opacity: 0.08 }} />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Camera className="w-16 h-16 text-accent/15" />
-                </div>
+                <Image
+                  src={author.photos[0]}
+                  alt="En mi cocina"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
                 <div className="absolute bottom-3 left-3 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-medium text-accent shadow-sm">
-                  En mi cocina
+                  soy ese
                 </div>
               </div>
-              <div className="aspect-square rounded-xl overflow-hidden relative ring-1 ring-black/5">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/15 to-primary/5">
-                  <div className="absolute inset-0" style={{ backgroundImage: 'url(/pattern-bg.jpg)', backgroundRepeat: 'repeat', backgroundSize: '100px 100px', opacity: 0.06 }} />
-                </div>
+              <div className="hidden sm:block aspect-square rounded-xl overflow-hidden relative ring-1 ring-black/5">
+                <Image
+                  src={author.photos[1]}
+                  alt="Galo Doublier"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                />
               </div>
-              <div className="aspect-square rounded-xl overflow-hidden relative ring-1 ring-black/5">
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/15 to-accent/5">
-                  <div className="absolute inset-0" style={{ backgroundImage: 'url(/pattern-bg.jpg)', backgroundRepeat: 'repeat', backgroundSize: '100px 100px', opacity: 0.06 }} />
-                </div>
+              <div className="hidden sm:block aspect-square rounded-xl overflow-hidden relative ring-1 ring-black/5">
+                <Image
+                  src={author.photos[2]}
+                  alt="Galo Doublier"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                />
               </div>
             </div>
             <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />

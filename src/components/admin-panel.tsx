@@ -158,7 +158,7 @@ export function AdminPanel({ recipes }: AdminPanelProps) {
                       asChild
                       className="h-8 w-8"
                     >
-                      <Link href={`/admin/editor/${recipe.slug}`}>
+                      <Link href={`/admin/editor/${recipe.id}`}>
                         <Edit3 className="w-4 h-4" />
                         <span className="sr-only">Editar</span>
                       </Link>
