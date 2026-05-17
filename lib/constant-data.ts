@@ -2,13 +2,13 @@ import { Recipe, Author, Maestro } from "./types";
 
 export const author: Author = {
   name: "Galo Doublier",
-  bio: `¡Hola! Soy Galo Doublier, una apasionada de la cocina casera que apenas está aprendiendo los secretos del buen comer. 
+  bio: `Hola! Soy Galo Doublier, un aficionado de la cocina casera en constante aprendizaje.
 
-**Aviso importante:** No soy chef profesional ni tengo formación culinaria formal. Simplemente soy una persona curiosa que disfruta experimentando en la cocina, a veces con éxito y otras... bueno, ¡aprendemos de los errores!
+**Aviso importante:** No soy chef profesional ni tengo formación culinaria formal (todavia, quién sabe). Simplemente soy una persona curiosa que disfruta experimentando en la cocina, a veces sale bien y otras veces la cago, pero siempre aprendo algo.
 
-Este rincón digital es donde comparto mis aventuras culinarias, las recetas que me han funcionado (después de varios intentos), y los trucos que voy descubriendo en el camino. Mi filosofía es simple: la cocina debe ser divertida, accesible y sin pretensiones.
+Esta página es donde comparto mis experiencias culinarias, las recetas que me funcionaron y los trucos que voy descubriendo en el camino. Mi filosofía es simple: si te gusta comer, te puede gusatr cocinar, por ende cualquiera puede cocinar.
 
-Si estás buscando recetas complicadas de alta cocina, este no es tu lugar. Pero si quieres acompañarme en este viaje de descubrimiento gastronómico, ¡bienvenido a Mi Cocina!`,
+Si estás buscando recetas complicadas de alta cocina, este **no es el lugar**. Pero si queres chusmear un par de recetas amateur y aprender conmigo, bienvenido sea!`,
   photos: [
     "/cocinero/cocinero1.jpg",
     "/cocinero/cocinero2.jpg",
@@ -19,17 +19,17 @@ Si estás buscando recetas complicadas de alta cocina, este no es tu lugar. Pero
 export const maestros: Maestro[] = [
   {
     name: "Monica",
-    description: "Mi primera maestra en la cocina. Me enseñó que la paciencia es el ingrediente más importante y que no hay prisa cuando cocinas con amor.",
+    description: "Mi madre... que decir, mi primera maestra en la cocina y en la vida. Me ayudo a dar mis primeros pasos y me enseñó a transmitir el amor a través de la comida. Experta en generar platos con cualquier tipo de ingredientes que haya.",
     imageUrl: "/maestros/monica.jpg",
   },
   {
     name: "Lidia",
-    description: "La reina de los postres. Gracias a ella aprendí que la repostería es una ciencia exacta donde cada gramo cuenta.",
+    description: "Mi abuela Lidia, la maestra del ojimetro , de pesar y medir las cosas con la palma de la mano. De ella aprendí la importacia de los condimentos y de improvisar para darle toques unicos a los platos.",
     imageUrl: "/maestros/lidia.jpg",
   },
   {
     name: "Noemi",
-    description: "Experta en sabores tradicionales. Me transmitió las recetas de su abuela y el valor de preservar la cocina de toda la vida.",
+    description: "Mi abuela Mimi, mejor conocida como Lali, la maestra de lo exacto. Experta en seguir el paso a paso, de ella aprendí que la precisión es también fundamental para los buenos platos.",
     imageUrl: "/maestros/noemi.jpg",
   },
 ];

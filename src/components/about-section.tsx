@@ -5,6 +5,7 @@ import { Button } from "@/src/components/ui/button";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import ReactMarkdown from "react-markdown";
 
 interface AboutSectionProps {
   onViewRecipes?: () => void;
@@ -62,23 +63,9 @@ export function AboutSection({ onViewRecipes }: AboutSectionProps) {
               ¡Hola! Soy {author.name}
             </h1>
             
-            <div className="mt-6 space-y-5 text-muted-foreground leading-relaxed">
-              <p className="text-lg">
-                Una apasionada de la cocina casera que apenas está aprendiendo los secretos del buen comer.
-              </p>
-              
-              <div className="decorative-quote bg-secondary/30 rounded-lg p-5 border-l-4 border-primary">
-                <p className="text-sm font-medium text-secondary-foreground leading-relaxed">
-                  <strong>Aviso importante:</strong> No soy chef profesional ni tengo formación culinaria formal. Simplemente soy una persona curiosa que disfruta experimentando en la cocina, a veces con éxito y otras... ¡aprendemos de los errores!
-                </p>
-              </div>
-              
-              <p>
-                Este rincón digital es donde comparto mis aventuras culinarias, las recetas que me han funcionado (después de varios intentos), y los trucos que voy descubriendo en el camino.
-              </p>
-              <p>
-                Mi filosofía es simple: la cocina debe ser <strong>divertida</strong>, <strong>accesible</strong> y <strong>sin pretensiones</strong>.
-              </p>
+            <div className="mt-6 text-muted-foreground leading-relaxed prose prose-stone dark:prose-invert max-w-none
+                            prose-p:leading-relaxed prose-strong:text-foreground prose-strong:font-semibold">
+              <ReactMarkdown>{author.bio}</ReactMarkdown>
             </div>
             <Link href="/recetas" className="inline-block mt-8">
               <Button
