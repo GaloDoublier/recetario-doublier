@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Recipe } from "@/lib/types";
 import { Button } from "@/src/components/ui/button";
 import { DifficultyBadge } from "./difficulty-badge";
@@ -8,6 +8,17 @@ import { StarRating } from "./star-rating";
 import { Plus, Edit3, Trash2, LogOut, Search, Loader2 } from "lucide-react";
 import { Input } from "@/src/components/ui/input";
 import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/src/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 
 
@@ -16,9 +27,33 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ recipes }: AdminPanelProps) {
-  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [recipeToDelete, setRecipeToDelete] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleDelete = async () => {
+    if (!recipeToDelete) return;
+    setIsDeleting(recipeToDelete);
+    setRecipeToDelete(null);
+    try {
+      const res = await fetch(`/api/recetas/${recipeToDelete}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Error al eliminar");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
+  useEffect(() => {
+    if (recipeToDelete) {
+      handleDelete();
+    }
+  }, [recipeToDelete]);
 
   const filteredRecipes = recipes.filter(
     (recipe) =>
@@ -123,25 +158,45 @@ export function AdminPanel({ recipes }: AdminPanelProps) {
                       asChild
                       className="h-8 w-8"
                     >
-                      <Link href={`/admin/editor/${recipe.id}`}>
+                      <Link href={`/admin/editor/${recipe.slug}`}>
                         <Edit3 className="w-4 h-4" />
                         <span className="sr-only">Editar</span>
                       </Link>
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {}}
-                      disabled={isDeleting === recipe.id}
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                    >
-                      {isDeleting === recipe.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-4 h-4" />
-                      )}
-                      <span className="sr-only">Eliminar</span>
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isDeleting === recipe.id}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                        >
+                          {isDeleting === recipe.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                          <span className="sr-only">Eliminar</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Eliminar Receta</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            ¿Seguro que deseas eliminar esta receta? Esta acción no se puede deshacer.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => setRecipeToDelete(recipe.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Eliminar
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </div>

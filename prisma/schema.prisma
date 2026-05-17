@@ -8,6 +8,7 @@ datasource db {
 
 model Receta {
   id                 String   @id @default(uuid())
+  slug               String   @unique
   createdAt          DateTime @default(now())
   title              String
   description        String

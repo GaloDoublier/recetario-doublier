@@ -79,15 +79,6 @@ export function SiteHeader() {
                   </Button>
                 );
               })}
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                onClick={() => setMobileMenuOpen(false)}
-                className="justify-start text-xs opacity-60"
-              >
-                <Link href="/admin">Admin</Link>
-              </Button>
             </div>
           </nav>
         )}

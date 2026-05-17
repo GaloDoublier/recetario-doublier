@@ -15,6 +15,7 @@ async function main() {
     {
       title: 'Tortilla de Patatas Clásica',
       description: 'La receta tradicional española, jugosa y con cebolla caramelizada.',
+      slug: 'tortilla-de-patatas-clasica',
       difficulty: 'Media',
       totalTime: 45,
       ricor: 5,
@@ -23,6 +24,7 @@ async function main() {
     },
     {
       title: 'Macarrones con Queso (Mac & Cheese)',
+      slug: 'macarrones-con-queso',
       description: 'Pasta cremosa con una mezcla intensa de quesos fundidos al horno.',
       difficulty: 'Baja',
       totalTime: 30,
@@ -32,6 +34,7 @@ async function main() {
     },
     {
       title: 'Risotto de Champiñones',
+      slug: 'risotto-de-champinones',
       description: 'Arroz meloso italiano con setas, vino blanco y queso parmesano.',
       difficulty: 'Alta',
       totalTime: 50,

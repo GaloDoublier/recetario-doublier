@@ -57,7 +57,7 @@ export const RecipeGrid = forwardRef<HTMLElement, RecipeGridProps>(
           {filteredRecipes.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRecipes.map((recipe, i) => (
-                <Link key={recipe.id} href={`/recetas/${recipe.id}`} className="block animate-fade-in-up" style={{ animationDelay: `${0.1 + i * 0.05}s` }}>
+                <Link key={recipe.slug} href={`/recetas/${recipe.slug}`} className="block animate-fade-in-up" style={{ animationDelay: `${0.1 + i * 0.05}s` }}>
                   <RecipeCard recipe={recipe} />
                 </Link>
               ))}

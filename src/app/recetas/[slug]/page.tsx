@@ -5,14 +5,12 @@ import { notFound } from "next/navigation";
 export default async function RecipePage({ 
   params 
 }: { 
-  params: Promise<{ id: string }> 
+  params: Promise<{ slug: string }> 
 }) {
-  // 1. En Next.js 15, debemos resolver la promesa de params
-  const { id } = await params;
+  const { slug } = await params; 
 
-  // 2. Buscar en Neon vía Prisma
   const recipe = await prisma.receta.findUnique({
-    where: { id },
+    where: { slug }, // 3. Le decimos a Prisma que busque por slug
   });
 
   if (!recipe) {
