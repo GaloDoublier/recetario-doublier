@@ -2,7 +2,6 @@
 
 import { author } from "@/lib/constant-data";
 import { Button } from "@/src/components/ui/button";
-import { Heart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -73,7 +72,6 @@ export function AboutSection({ onViewRecipes }: AboutSectionProps) {
                 size="lg"
                 className="gap-2 shadow-sm hover:shadow-md transition-all"
               >
-                <Heart className="w-4 h-4" />
                 Ver Mis Recetas
               </Button>
             </Link>
