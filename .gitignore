@@ -18,3 +18,4 @@ node_modules
 /src/generated/prisma
 tsconfig.tsbuildinfo
 next-env.d.ts
+.vercel

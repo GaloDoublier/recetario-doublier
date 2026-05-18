@@ -12,8 +12,8 @@ interface AboutSectionProps {
 
 export function AboutSection({ onViewRecipes }: AboutSectionProps) {
   return (
-    <section className="py-16 md:py-24 pattern-section">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-1">
+    <section className=" pattern-bg">
+      <div className="max-w-6xl py-16 md:py-24 bg-white min-h-scree h-full mx-auto px-4 sm:px-6 lg:px-8 relative z-1">
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           {/* Photo gallery */}
           <div className="relative animate-fade-in-up">

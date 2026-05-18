@@ -45,11 +45,11 @@ export const RecipeGrid = forwardRef<HTMLElement, RecipeGridProps>(
               Mis Creaciones
             </span>
             <h2 className="mt-4 text-3xl md:text-4xl font-heading font-bold text-foreground text-balance leading-tight">
-              Recetas del Corazón
+              Recetas Doublier
             </h2>
             <div className="section-divider mt-4" />
             <p className="mt-6 text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Cada receta tiene su historia, sus tropiezos y sus triunfos. Aquí comparto las que mejor me han salido... ¡después de varios intentos!
+              Cada receta tiene su historia, sus tips y sus complicaciones. Aca les comparto las que mejor me salieron, animate a probarlas!
             </p>
           </div>
 

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Nunito, Geist_Mono, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SiteHeader } from "@/src/components/site-header";
+import { EasterEggLogo } from '../components/easter-egg-logo';
 import './globals.css'
 import Image from "next/image";
 
@@ -52,7 +53,7 @@ export default function RootLayout({
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Image src="/galogo.png" alt="Logo" width={70} height={70} className="text-primary-foreground rounded-full" />
+                <EasterEggLogo/>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Recetario-Doublier — Mi recetario personal y casero
