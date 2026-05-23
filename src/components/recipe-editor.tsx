@@ -7,6 +7,7 @@ import remarkGfm from "remark-gfm";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { StarRating } from "./star-rating";
+import { CldUploadWidget } from "next-cloudinary";
 import {
   ArrowLeft,
   Bold,
@@ -17,6 +18,9 @@ import {
   Save,
   Loader2,
   AlertCircle,
+  ImagePlus,
+  Trash2,
+  ImageIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -130,7 +134,6 @@ export function RecipeEditor({ recipe }: RecipeEditorProps) {
               Volver al panel
             </Link>
           </Button>
-          
         </div>
 
         {error && (
@@ -205,16 +208,65 @@ export function RecipeEditor({ recipe }: RecipeEditorProps) {
                 />
               </div>
 
+              {/* CLOUDINARY */}
               <div className="space-y-2">
-                <label htmlFor="imagenUrl" className="text-sm font-medium text-foreground">
-                  URL de la imagen
+                <label className="text-sm font-medium text-foreground">
+                  Imagen de la receta
                 </label>
-                <Input
-                  id="imagenUrl"
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  value={imagenUrl}
-                  onChange={(e) => setImagenUrl(e.target.value)}
-                />
+                
+                <CldUploadWidget 
+                  uploadPreset="recetario_fotos" 
+                  onSuccess={(result: any) => {
+                    if (result.info?.secure_url) {
+                      setImagenUrl(result.info.secure_url);
+                    }
+                  }}
+                >
+                  {({ open }) => (
+                    <div className="flex flex-col gap-3">
+                      {imagenUrl ? (
+                        <div className="relative w-full h-32 rounded-md overflow-hidden border border-border group">
+                          <img 
+                            src={imagenUrl} 
+                            alt="Vista previa" 
+                            className="object-cover w-full h-full"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <Button 
+                              type="button" 
+                              variant="secondary" 
+                              size="sm" 
+                              onClick={() => open()}
+                            >
+                              Cambiar
+                            </Button>
+                            <Button 
+                              type="button" 
+                              variant="destructive" 
+                              size="sm" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setImagenUrl("");
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="h-32 w-full border-dashed flex flex-col gap-2 hover:bg-muted/50"
+                          onClick={() => open()}
+                        >
+                          <ImagePlus className="w-6 h-6 text-muted-foreground" />
+                          <span className="text-muted-foreground">Subir foto (Click acá)</span>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </CldUploadWidget>
               </div>
             </div>
 
@@ -291,6 +343,53 @@ export function RecipeEditor({ recipe }: RecipeEditorProps) {
                   >
                     <List className="w-4 h-4" />
                   </Button>
+
+                  {/* Imagen en markdown */}
+                  <div className="w-px h-4 bg-border mx-1" />
+                  <CldUploadWidget 
+                    uploadPreset="recetario_fotos"
+                    onSuccess={(result: any) => {
+                      if (result.info?.secure_url) {
+                        const url = result.info.secure_url;
+                        setContenido((prev) => 
+                          prev.replace("![Cargando imagen...]()", `![Imagen de la receta](${url})`)
+                        );
+                      }
+                    }}
+                    onClose={() => {
+                      setContenido((prev) => 
+                        prev.replace("![Cargando imagen...]()", "")
+                      );
+                    }}
+                  >
+                    {({ open }) => (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          const textarea = textareaRef.current;
+                          if (textarea) {
+                            // Capturamos dónde está el cursor
+                            const start = textarea.selectionStart;
+                            const end = textarea.selectionEnd;
+                            const currentContent = contenido;
+                            
+                            // Inyectamos el texto de carga justo ahí
+                            const placeholder = "![Cargando imagen...]()";
+                            const next = currentContent.substring(0, start) + placeholder + currentContent.substring(end);
+                            setContenido(next);
+                          }
+                          // Abrimos el subidor de Cloudinary
+                          open();
+                        }}
+                        title="Insertar imagen en el texto"
+                      >
+                        <ImageIcon className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </CldUploadWidget>
                 </div>
               )}
 
