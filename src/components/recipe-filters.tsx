@@ -13,6 +13,8 @@ export interface RecipeFilters {
 interface RecipeFiltersProps {
   filters: RecipeFilters;
   onFiltersChange: (filters: RecipeFilters) => void;
+  compact?: boolean;
+  disabled?: boolean;
 }
 
 const difficultyOptions = ["Baja", "Media", "Alta"];
@@ -23,7 +25,7 @@ const timeOptions = [
   { label: "> 60 min", value: 61 },
 ];
 
-export function RecipeFiltersComponent({ filters, onFiltersChange }: RecipeFiltersProps) {
+export function RecipeFiltersComponent({ filters, onFiltersChange, compact = false, disabled = false }: RecipeFiltersProps) {
   const hasActiveFilters = filters.difficulty || filters.minRicor || filters.maxTime;
 
   const clearFilters = () => {
@@ -31,14 +33,18 @@ export function RecipeFiltersComponent({ filters, onFiltersChange }: RecipeFilte
   };
 
   return (
-    <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 md:p-6 mb-8 card-pattern">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+    <div className={cn(
+      "bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 md:p-6 mb-8 card-pattern",
+      compact && "mb-0 border-0 bg-transparent p-0 md:p-0"
+    )}>
+      <div className={cn("flex flex-wrap items-center justify-between gap-4 mb-4", compact && "gap-2")}>
         <h3 className="font-semibold text-foreground font-heading">Filtrar recetas</h3>
         {hasActiveFilters && (
           <Button
             variant="ghost"
             size="sm"
             onClick={clearFilters}
+            disabled={disabled}
             className="text-muted-foreground hover:text-foreground gap-1"
           >
             <X className="w-4 h-4" />
@@ -47,7 +53,7 @@ export function RecipeFiltersComponent({ filters, onFiltersChange }: RecipeFilte
         )}
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-6">
+      <div className={cn("grid sm:grid-cols-3 gap-6", compact && "grid-cols-1 gap-4 sm:grid-cols-1")}>
         {/* Difficulty */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
@@ -60,6 +66,7 @@ export function RecipeFiltersComponent({ filters, onFiltersChange }: RecipeFilte
                 key={diff}
                 variant={filters.difficulty === diff ? "default" : "outline"}
                 size="sm"
+                disabled={disabled}
                 onClick={() => {
                   onFiltersChange({
                     ...filters,
@@ -90,6 +97,7 @@ export function RecipeFiltersComponent({ filters, onFiltersChange }: RecipeFilte
                 key={ricor}
                 variant={filters.minRicor === ricor ? "default" : "outline"}
                 size="sm"
+                disabled={disabled}
                 onClick={() => {
                   onFiltersChange({
                     ...filters,
@@ -110,7 +118,7 @@ export function RecipeFiltersComponent({ filters, onFiltersChange }: RecipeFilte
 
         {/* Time */}
         <div>
-          <label className="flex item s-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+          <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
             <Clock className="w-4 h-4 text-primary" />
             Tiempo
           </label>
@@ -120,6 +128,7 @@ export function RecipeFiltersComponent({ filters, onFiltersChange }: RecipeFilte
                 key={time.value}
                 variant={filters.maxTime === time.value ? "default" : "outline"}
                 size="sm"
+                disabled={disabled}
                 onClick={() => {
                   onFiltersChange({
                     ...filters,
