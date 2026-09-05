@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  BookMarked,
   ChefHat,
   Clock3,
   Lightbulb,
@@ -123,7 +122,8 @@ export function RecipeRoulette({
   const [removedIds, setRemovedIds] = useState<string[]>([]);
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [includeWishlist, setIncludeWishlist] = useState(true);
+  const [includeRecipes, setIncludeRecipes] = useState(true);
+  const [includeWishlist, setIncludeWishlist] = useState(false);
   const [winner, setWinner] = useState<RouletteItem | null>(null);
   const [pendingWinner, setPendingWinner] = useState<RouletteItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -153,12 +153,12 @@ export function RecipeRoulette({
 
   const rouletteItems = useMemo<RouletteItem[]>(
     () => [
-      ...filteredRecipes,
+      ...(includeRecipes ? filteredRecipes : []),
       ...(includeWishlist
         ? wishlistItems.map((item) => ({ ...item, kind: "wishlist" as const }))
         : []),
     ],
-    [filteredRecipes, includeWishlist, wishlistItems],
+    [filteredRecipes, includeRecipes, includeWishlist, wishlistItems],
   );
 
   const available = useMemo(
@@ -167,6 +167,7 @@ export function RecipeRoulette({
   );
 
   const removedCount = removedIds.length;
+  const hasEnabledSource = includeRecipes || includeWishlist;
 
   const sliceAngle = available.length ? 360 / available.length : 360;
   const labelRadius = useMemo(() => {
@@ -273,6 +274,13 @@ export function RecipeRoulette({
   function updateWishlistVisibility(checked: boolean) {
     if (isSpinning) return;
     setIncludeWishlist(checked);
+    setRotation(0);
+    setWinner(null);
+  }
+
+  function updateRecipeVisibility(checked: boolean) {
+    if (isSpinning) return;
+    setIncludeRecipes(checked);
     setRotation(0);
     setWinner(null);
   }
@@ -427,10 +435,12 @@ export function RecipeRoulette({
                 opciones en juego
               </p>
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <span className="size-2 rounded-full bg-primary" />
-                  {filteredRecipes.length} con receta
-                </span>
+                {includeRecipes && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-primary" />
+                    {filteredRecipes.length} con receta
+                  </span>
+                )}
                 {includeWishlist && (
                   <span className="flex items-center gap-1.5">
                     <span className="size-2 rounded-full bg-[#315d69]" />
@@ -451,31 +461,58 @@ export function RecipeRoulette({
 
             <div className="my-6 h-px bg-border" />
 
-            <label
-              htmlFor="include-wishlist"
-              className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[#315d69]/20 bg-[#315d69]/6 p-4 transition-colors hover:bg-[#315d69]/10 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60"
-            >
-              <Checkbox
-                id="include-wishlist"
-                checked={includeWishlist}
-                onCheckedChange={(checked) =>
-                  updateWishlistVisibility(checked === true)
-                }
-                disabled={isSpinning || wishlistItems.length === 0}
-                className="mt-0.5 border-[#315d69]/50 data-[state=checked]:border-[#315d69] data-[state=checked]:bg-[#315d69]"
-              />
-              <span className="min-w-0">
-                <span className="flex items-center gap-2 text-sm font-bold text-foreground">
-                  <BookMarked className="size-4 text-[#315d69]" />
-                  Incluir wishlist
-                </span>
-                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                  Suma {wishlistItems.length}{" "}
-                  {wishlistItems.length === 1 ? "idea sin receta" : "ideas sin receta"}.
-                  Los filtros de arriba no se les aplican.
-                </span>
-              </span>
-            </label>
+            <div>
+              <p className="font-heading text-sm font-bold text-foreground">
+                Tipos de receta:
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-4">
+                <label
+                  htmlFor="include-recipes"
+                  className="flex cursor-pointer items-start gap-2.5 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60"
+                >
+                  <Checkbox
+                    id="include-recipes"
+                    checked={includeRecipes}
+                    onCheckedChange={(checked) =>
+                      updateRecipeVisibility(checked === true)
+                    }
+                    disabled={isSpinning}
+                    className="mt-0.5"
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">
+                      Recetas originales
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      Platos con receta.
+                    </span>
+                  </span>
+                </label>
+
+                <label
+                  htmlFor="include-wishlist"
+                  className="flex cursor-pointer items-start gap-2.5 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60"
+                >
+                  <Checkbox
+                    id="include-wishlist"
+                    checked={includeWishlist}
+                    onCheckedChange={(checked) =>
+                      updateWishlistVisibility(checked === true)
+                    }
+                    disabled={isSpinning}
+                    className="mt-0.5 border-[#315d69]/50 data-[state=checked]:border-[#315d69] data-[state=checked]:bg-[#315d69]"
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">
+                      Wishlist
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      Ideas que todavía no cociné / no subí receta.
+                    </span>
+                  </span>
+                </label>
+              </div>
+            </div>
 
             <div className="my-6 h-px bg-border" />
 
@@ -510,10 +547,15 @@ export function RecipeRoulette({
               >
                 <TriangleAlert className="mt-0.5 size-5 shrink-0 text-primary" />
                 <p>
-                  <strong>No quedaron opciones.</strong>
+                  <strong>
+                    {hasEnabledSource
+                      ? "No quedaron opciones."
+                      : "Elegí qué incluir."}
+                  </strong>
                   <br />
-                  Probá cambiando los filtros o restaurando las opciones
-                  descartadas.
+                  {hasEnabledSource
+                    ? "Probá cambiando los filtros, activando otra fuente o restaurando las opciones descartadas."
+                    : "Activá Recetas originales, Wishlist o ambas para armar la ruleta."}
                 </p>
               </div>
             )}
@@ -581,7 +623,7 @@ export function RecipeRoulette({
                         <>
                           <Lightbulb className="relative z-10 size-16 text-[#f7e1a7]" />
                           <span className="relative z-10 mt-3 rounded-full border border-white/20 bg-black/10 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-white">
-                            Idea por cocinar
+                            Idea para receta futura
                           </span>
                         </>
                       ) : (
@@ -630,12 +672,8 @@ export function RecipeRoulette({
                     </Button>
                   </>
                 ) : (
-                  <div className="mt-5 flex gap-3 rounded-2xl border border-[#315d69]/20 bg-[#315d69]/8 p-4">
-                    <Sparkles className="mt-0.5 size-5 shrink-0 text-[#315d69]" />
-                    <div>
-                      <p className="font-heading text-lg font-bold text-foreground">
-                        Pronto lo cocinaré
-                      </p>
+                  <div className="mt-5 flex gap-3 rounded-2xl border border-[#315d69]/20 bg-[#315d69]/8 p-4">                    <div>
+
                       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                         Todavía no hay una receta cargada para este plato, pero
                         ya está en la lista de próximas ideas.

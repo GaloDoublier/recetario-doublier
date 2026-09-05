@@ -115,8 +115,7 @@ export function WishlistManager({ initialItems }: WishlistManagerProps) {
             </div>
 
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Anotá platos que todavía no tienen receta. Van a poder entrar en
-              la ruleta como ideas, sin mezclarse con el recetario publicado.
+              Platos que voy a cocinar eventualmente cuando tenga tiempo :D
             </p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-3">
@@ -128,7 +127,7 @@ export function WishlistManager({ initialItems }: WishlistManagerProps) {
                   id="wishlist-title"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
-                  placeholder="Ej. Ravioles de calabaza"
+                  placeholder="Nombre de la receta"
                   maxLength={100}
                   required
                   disabled={isAdding}
@@ -147,7 +146,7 @@ export function WishlistManager({ initialItems }: WishlistManagerProps) {
                   maxLength={280}
                   required
                   disabled={isAdding}
-                  className="min-h-24 resize-none bg-card/90"
+                  className="min-h-72 resize-none bg-card/90"
                 />
                 <p className="mt-1.5 text-right text-xs text-muted-foreground">
                   {description.length}/280
@@ -156,7 +155,7 @@ export function WishlistManager({ initialItems }: WishlistManagerProps) {
               <Button
                 type="submit"
                 disabled={!title.trim() || !description.trim() || isAdding}
-                className="h-11 w-full rounded-xl"
+                className="h-11 mt-4 w-full rounded-xl"
               >
                 {isAdding ? (
                   <Loader2 className="animate-spin" />

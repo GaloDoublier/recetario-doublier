@@ -91,7 +91,7 @@ export function AdminPanel({ recipes, wishlistItems }: AdminPanelProps) {
           </div>
         </div>
 
-        <WishlistManager initialItems={wishlistItems} />
+
 
         {/* Search */}
         <div className="relative mb-6">
@@ -205,8 +205,13 @@ export function AdminPanel({ recipes, wishlistItems }: AdminPanelProps) {
                 </div>
               </div>
             ))}
+            
           </div>
         </div>
+        <div className="mt-8">
+          <WishlistManager initialItems={wishlistItems} />
+        </div>
+      
       </div>
     </div>
   );
