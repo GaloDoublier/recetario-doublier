@@ -9,21 +9,27 @@ export const metadata: Metadata = {
 
 export default async function QueComoHoyPage() {
   try {
-    const recipes = await prisma.receta.findMany({
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        description: true,
-        difficulty: true,
-        totalTime: true,
-        ricor: true,
-        imagen_url: true,
-      },
-      orderBy: { title: "asc" },
-    });
+    const [recipes, wishlistItems] = await Promise.all([
+      prisma.receta.findMany({
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          description: true,
+          difficulty: true,
+          totalTime: true,
+          ricor: true,
+          imagen_url: true,
+        },
+        orderBy: { title: "asc" },
+      }),
+      prisma.wishlistItem.findMany({
+        select: { id: true, title: true, description: true },
+        orderBy: { title: "asc" },
+      }),
+    ]);
 
-    return <RecipeRoulette recipes={recipes} />;
+    return <RecipeRoulette recipes={recipes} wishlistItems={wishlistItems} />;
   } catch (error) {
     console.error("Error al cargar la ruleta de recetas:", error);
 
