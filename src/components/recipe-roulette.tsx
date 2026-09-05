@@ -4,12 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
+  BookMarked,
   ChefHat,
   Clock3,
+  Lightbulb,
   RefreshCcw,
   RotateCw,
   Sparkles,
-  UtensilsCrossed,
   TriangleAlert,
 } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
@@ -23,6 +24,7 @@ import {
 import { DifficultyBadge } from "@/src/components/difficulty-badge";
 import { StarRating } from "@/src/components/star-rating";
 import { RecipeFiltersComponent, type RecipeFilters } from "@/src/components/recipe-filters";
+import { Checkbox } from "@/src/components/ui/checkbox";
 
 type RouletteRecipe = {
   id: string;
@@ -35,6 +37,16 @@ type RouletteRecipe = {
   imagen_url: string | null;
 };
 
+type RouletteWishlistItem = {
+  id: string;
+  title: string;
+  description: string;
+};
+
+type RouletteItem =
+  | (RouletteRecipe & { kind: "recipe" })
+  | (RouletteWishlistItem & { kind: "wishlist" });
+
 const SLICE_COLORS = [
   "#d83a2f",
   "#f3c969",
@@ -45,6 +57,12 @@ const SLICE_COLORS = [
   "#e7b94f",
   "#69855e",
 ];
+
+const WISHLIST_SLICE_COLORS = ["#315d69", "#467d84"];
+
+function itemKey(item: RouletteItem) {
+  return `${item.kind}:${item.id}`;
+}
 
 function polarToCartesian(angle: number, radius: number) {
   const radians = ((angle - 90) * Math.PI) / 180;
@@ -90,7 +108,13 @@ function titleLines(title: string, count: number) {
   return lines.slice(0, 2);
 }
 
-export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
+export function RecipeRoulette({
+  recipes,
+  wishlistItems,
+}: {
+  recipes: RouletteRecipe[];
+  wishlistItems: RouletteWishlistItem[];
+}) {
   const [filters, setFilters] = useState<RecipeFilters>({
     difficulty: null,
     minRicor: null,
@@ -99,24 +123,47 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
   const [removedIds, setRemovedIds] = useState<string[]>([]);
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [winner, setWinner] = useState<RouletteRecipe | null>(null);
-  const [pendingWinner, setPendingWinner] = useState<RouletteRecipe | null>(null);
+  const [includeWishlist, setIncludeWishlist] = useState(true);
+  const [winner, setWinner] = useState<RouletteItem | null>(null);
+  const [pendingWinner, setPendingWinner] = useState<RouletteItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const spinTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pointerRef = useRef<HTMLDivElement>(null);
   const pointerAnimation = useRef<Animation | null>(null);
 
-  const filteredRecipes = useMemo(() => recipes.filter((recipe) => {
-    if (filters.difficulty && recipe.difficulty !== filters.difficulty) return false;
-    if (filters.minRicor && recipe.ricor < filters.minRicor) return false;
-    if (filters.maxTime === 61 && recipe.totalTime <= 60) return false;
-    if (filters.maxTime && filters.maxTime !== 61 && recipe.totalTime > filters.maxTime) return false;
-    return true;
-  }), [recipes, filters]);
+  const filteredRecipes = useMemo(
+    () =>
+      recipes
+        .filter((recipe) => {
+          if (filters.difficulty && recipe.difficulty !== filters.difficulty)
+            return false;
+          if (filters.minRicor && recipe.ricor < filters.minRicor) return false;
+          if (filters.maxTime === 61 && recipe.totalTime <= 60) return false;
+          if (
+            filters.maxTime &&
+            filters.maxTime !== 61 &&
+            recipe.totalTime > filters.maxTime
+          )
+            return false;
+          return true;
+        })
+        .map((recipe) => ({ ...recipe, kind: "recipe" as const })),
+    [recipes, filters],
+  );
+
+  const rouletteItems = useMemo<RouletteItem[]>(
+    () => [
+      ...filteredRecipes,
+      ...(includeWishlist
+        ? wishlistItems.map((item) => ({ ...item, kind: "wishlist" as const }))
+        : []),
+    ],
+    [filteredRecipes, includeWishlist, wishlistItems],
+  );
 
   const available = useMemo(
-    () => filteredRecipes.filter((recipe) => !removedIds.includes(recipe.id)),
-    [filteredRecipes, removedIds],
+    () => rouletteItems.filter((item) => !removedIds.includes(itemKey(item))),
+    [rouletteItems, removedIds],
   );
 
   const removedCount = removedIds.length;
@@ -204,7 +251,7 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
 
   function removeWinnerFromRoulette() {
     if (!winner) return;
-    setRemovedIds((ids) => [...ids, winner.id]);
+    setRemovedIds((ids) => [...ids, itemKey(winner)]);
     setModalOpen(false);
     setWinner(null);
   }
@@ -219,6 +266,13 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
   function updateFilters(nextFilters: RecipeFilters) {
     if (isSpinning) return;
     setFilters(nextFilters);
+    setRotation(0);
+    setWinner(null);
+  }
+
+  function updateWishlistVisibility(checked: boolean) {
+    if (isSpinning) return;
+    setIncludeWishlist(checked);
     setRotation(0);
     setWinner(null);
   }
@@ -267,23 +321,33 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
                   viewBox="0 0 400 400"
                   className="h-full w-full"
                   role="img"
-                  aria-label={`Ruleta con ${available.length} recetas disponibles`}
+                  aria-label={`Ruleta con ${available.length} opciones disponibles`}
                 >
                   {available.length === 1 ? (
                     <circle
                       cx="200"
                       cy="200"
                       r="188"
-                      fill={SLICE_COLORS[0]}
+                      fill={
+                        available[0].kind === "wishlist"
+                          ? WISHLIST_SLICE_COLORS[0]
+                          : SLICE_COLORS[0]
+                      }
                       stroke="#fff7e8"
                       strokeWidth="2"
                     />
                   ) : (
                     available.map((recipe, index) => (
                       <path
-                        key={recipe.id}
+                        key={itemKey(recipe)}
                         d={sectorPath(index, available.length)}
-                        fill={SLICE_COLORS[index % SLICE_COLORS.length]}
+                        fill={
+                          recipe.kind === "wishlist"
+                            ? WISHLIST_SLICE_COLORS[
+                                index % WISHLIST_SLICE_COLORS.length
+                              ]
+                            : SLICE_COLORS[index % SLICE_COLORS.length]
+                        }
                         stroke="#fff7e8"
                         strokeWidth={available.length > 20 ? 1 : 2}
                       />
@@ -293,9 +357,9 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
                   {available.map((recipe, index) => {
                     const centerAngle = index * sliceAngle + sliceAngle / 2;
                     const label = polarToCartesian(centerAngle, labelRadius);
-                    const lightSlice = [1, 4, 6].includes(
-                      index % SLICE_COLORS.length,
-                    );
+                    const lightSlice =
+                      recipe.kind === "recipe" &&
+                      [1, 4, 6].includes(index % SLICE_COLORS.length);
                     const readableAngle =
                       centerAngle > 90 && centerAngle < 270
                         ? centerAngle - 90
@@ -303,7 +367,7 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
                     const lines = titleLines(recipe.title, available.length);
                     return (
                       <text
-                        key={`label-${recipe.id}`}
+                        key={`label-${itemKey(recipe)}`}
                         x={label.x}
                         y={label.y}
                         fill={lightSlice ? "#341b15" : "#fffaf0"}
@@ -322,7 +386,7 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
                       >
                         {lines.map((line, lineIndex) => (
                           <tspan
-                            key={`${recipe.id}-${lineIndex}`}
+                            key={`${itemKey(recipe)}-${lineIndex}`}
                             x={label.x}
                             dy={lineIndex === 0 ? (lines.length > 1 ? "-0.55em" : "0") : "1.15em"}
                           >
@@ -360,8 +424,20 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
                 {available.length}
               </span>
               <p className="mt-1 text-sm text-muted-foreground">
-                recetas en juego
+                opciones en juego
               </p>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <span className="size-2 rounded-full bg-primary" />
+                  {filteredRecipes.length} con receta
+                </span>
+                {includeWishlist && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-[#315d69]" />
+                    {wishlistItems.length} por cocinar
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="my-6 h-px bg-border" />
@@ -372,6 +448,34 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
               compact
               disabled={isSpinning}
             />
+
+            <div className="my-6 h-px bg-border" />
+
+            <label
+              htmlFor="include-wishlist"
+              className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[#315d69]/20 bg-[#315d69]/6 p-4 transition-colors hover:bg-[#315d69]/10 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60"
+            >
+              <Checkbox
+                id="include-wishlist"
+                checked={includeWishlist}
+                onCheckedChange={(checked) =>
+                  updateWishlistVisibility(checked === true)
+                }
+                disabled={isSpinning || wishlistItems.length === 0}
+                className="mt-0.5 border-[#315d69]/50 data-[state=checked]:border-[#315d69] data-[state=checked]:bg-[#315d69]"
+              />
+              <span className="min-w-0">
+                <span className="flex items-center gap-2 text-sm font-bold text-foreground">
+                  <BookMarked className="size-4 text-[#315d69]" />
+                  Incluir wishlist
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                  Suma {wishlistItems.length}{" "}
+                  {wishlistItems.length === 1 ? "idea sin receta" : "ideas sin receta"}.
+                  Los filtros de arriba no se les aplican.
+                </span>
+              </span>
+            </label>
 
             <div className="my-6 h-px bg-border" />
 
@@ -393,7 +497,7 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
                 <p>
                   <strong>Hace falta otra opción.</strong>
                   <br />
-                  Una ruleta no puede girar con una única receta. Cambiá los
+                  Una ruleta no puede girar con una única opción. Cambiá los
                   filtros o restaurá las descartadas.
                 </p>
               </div>
@@ -408,7 +512,7 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
                 <p>
                   <strong>No quedaron opciones.</strong>
                   <br />
-                  Probá cambiando los filtros o restaurando las recetas
+                  Probá cambiando los filtros o restaurando las opciones
                   descartadas.
                 </p>
               </div>
@@ -460,16 +564,29 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
                 })}
               </div>
               <div className="overflow-hidden rounded-lg bg-card shadow-2xl">
-                <div className="relative h-52 overflow-hidden bg-secondary sm:h-60">
-                  {winner.imagen_url ? (
+                <div
+                  className={`relative h-52 overflow-hidden sm:h-60 ${
+                    winner.kind === "wishlist" ? "bg-[#315d69]" : "bg-secondary"
+                  }`}
+                >
+                  {winner.kind === "recipe" && winner.imagen_url ? (
                     <img
                       src={winner.imagen_url}
                       alt={winner.title}
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="pattern-bg-subtle flex h-full items-center justify-center">
-                      <ChefHat className="relative z-10 size-16 text-primary/55" />
+                    <div className="pattern-bg-subtle flex h-full flex-col items-center justify-center">
+                      {winner.kind === "wishlist" ? (
+                        <>
+                          <Lightbulb className="relative z-10 size-16 text-[#f7e1a7]" />
+                          <span className="relative z-10 mt-3 rounded-full border border-white/20 bg-black/10 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-white">
+                            Idea por cocinar
+                          </span>
+                        </>
+                      ) : (
+                        <ChefHat className="relative z-10 size-16 text-primary/55" />
+                      )}
                     </div>
                   )}
                   </div>
@@ -479,32 +596,53 @@ export function RecipeRoulette({ recipes }: { recipes: RouletteRecipe[] }) {
                   <DialogTitle className="pr-8 font-heading text-3xl font-bold leading-tight text-foreground">
                     {winner.title}
                   </DialogTitle>
-                  <DialogDescription className="line-clamp-2 pt-1 text-sm leading-relaxed">
+                  <DialogDescription
+                    className={`pt-1 text-sm leading-relaxed ${
+                      winner.kind === "recipe" ? "line-clamp-2" : ""
+                    }`}
+                  >
                     {winner.description}
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="mt-5 flex flex-wrap items-center gap-3 border-y border-border py-4">
-                  <DifficultyBadge
-                    difficulty={winner.difficulty as "Baja" | "Media" | "Alta"}
-                    size="sm"
-                  />
-                  <span className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-                    <Clock3 className="size-4 text-primary" />{" "}
-                    {winner.totalTime} min
-                  </span>
-                  <StarRating rating={winner.ricor} size="sm" />
-                </div>
+                {winner.kind === "recipe" ? (
+                  <>
+                    <div className="mt-5 flex flex-wrap items-center gap-3 border-y border-border py-4">
+                      <DifficultyBadge
+                        difficulty={winner.difficulty as "Baja" | "Media" | "Alta"}
+                        size="sm"
+                      />
+                      <span className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
+                        <Clock3 className="size-4 text-primary" />{" "}
+                        {winner.totalTime} min
+                      </span>
+                      <StarRating rating={winner.ricor} size="sm" />
+                    </div>
 
-                <Button
-                  asChild
-                  size="lg"
-                  className="mt-5 h-12 w-full rounded-xl text-base"
-                >
-                  <Link href={`/recetas/${winner.slug}`}>
-                    Ver esta receta <ArrowRight />
-                  </Link>
-                </Button>
+                    <Button
+                      asChild
+                      size="lg"
+                      className="mt-5 h-12 w-full rounded-xl text-base"
+                    >
+                      <Link href={`/recetas/${winner.slug}`}>
+                        Ver esta receta <ArrowRight />
+                      </Link>
+                    </Button>
+                  </>
+                ) : (
+                  <div className="mt-5 flex gap-3 rounded-2xl border border-[#315d69]/20 bg-[#315d69]/8 p-4">
+                    <Sparkles className="mt-0.5 size-5 shrink-0 text-[#315d69]" />
+                    <div>
+                      <p className="font-heading text-lg font-bold text-foreground">
+                        Pronto lo cocinaré
+                      </p>
+                      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                        Todavía no hay una receta cargada para este plato, pero
+                        ya está en la lista de próximas ideas.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button

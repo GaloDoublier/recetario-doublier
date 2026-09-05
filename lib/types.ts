@@ -16,6 +16,12 @@ export interface Recipe {
   content: string; // Markdown/HTML content for recipe detail
 }
 
+export interface WishlistItem {
+  id: string;
+  title: string;
+  description: string;
+}
+
 export interface Author {
   name: string;
   bio: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Recipe } from "@/lib/types";
+import { Recipe, WishlistItem } from "@/lib/types";
 import { Button } from "@/src/components/ui/button";
 import { DifficultyBadge } from "./difficulty-badge";
 import { StarRating } from "./star-rating";
@@ -20,13 +20,15 @@ import {
   AlertDialogAction,
 } from "@/src/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import { WishlistManager } from "./wishlist-manager";
 
 
 interface AdminPanelProps {
   recipes: Recipe[];
+  wishlistItems: WishlistItem[];
 }
 
-export function AdminPanel({ recipes }: AdminPanelProps) {
+export function AdminPanel({ recipes, wishlistItems }: AdminPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [recipeToDelete, setRecipeToDelete] = useState<string | null>(null);
@@ -88,6 +90,8 @@ export function AdminPanel({ recipes }: AdminPanelProps) {
             </Button>
           </div>
         </div>
+
+        <WishlistManager initialItems={wishlistItems} />
 
         {/* Search */}
         <div className="relative mb-6">
