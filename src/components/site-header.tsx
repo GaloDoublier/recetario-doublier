@@ -1,6 +1,6 @@
 "use client";
 
-import { ChefHat, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ export function SiteHeader() {
   const navItems = [
     { label: "Inicio", href: "/" },
     { label: "Recetas", href: "/recetas" },
+    { label: "¿Qué como hoy?", href: "/que-como-hoy" },
   ];
 
   return (
@@ -35,7 +36,7 @@ export function SiteHeader() {
 
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || (item.href === "/" && pathname === "/");
+              const isActive = pathname === item.href;
               return (
                 <Button
                   key={item.href}

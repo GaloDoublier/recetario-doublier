@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
     });
 
     revalidatePath("/recetas");
+    revalidatePath("/que-como-hoy");
     revalidatePath("/admin/panel");
 
     return NextResponse.json(recipe, { status: 201 });

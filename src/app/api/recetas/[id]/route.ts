@@ -20,6 +20,7 @@ export async function DELETE(
     });
 
     revalidatePath("/recetas");
+    revalidatePath("/que-como-hoy");
     revalidatePath("/admin/panel");
     revalidatePath(`/admin/editor/${id}`);
 
@@ -69,6 +70,7 @@ export async function PUT(
     });
 
     revalidatePath("/recetas");
+    revalidatePath("/que-como-hoy");
     revalidatePath(`/recetas/${recipe.slug}`); 
     revalidatePath("/admin/panel");
     revalidatePath(`/admin/editor/${id}`);
